@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS go_cron DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+
 CREATE TABLE `task_log` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `task_id` int NOT NULL DEFAULT '0' COMMENT '任务ID',
@@ -34,13 +36,11 @@ CREATE TABLE `task` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='任务表';
 
-INSERT INTO `auth`(`id`, `app_key`, `app_secret`, `created`, `updated`) VALUES (1, 'eddycjy', 'go-programming-tour-book' , NOW(), NOW());
-
 CREATE TABLE `user` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(20) NOT NULL COMMENT '账号',
   `password` varchar(255) NOT NULL COMMENT '密码',
-  `salt` varchar(20) NOT NULL COMMENT "加密盐",
+  `salt` varchar(20) NOT NULL COMMENT '加密盐',
   `created` datetime NOT NULL COMMENT '添加时间',
   `updated` datetime NOT NULL COMMENT '更新时间',
   `is_del` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否被删除',

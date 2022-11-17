@@ -12,9 +12,9 @@ App:
 Database:
   DBType: mysql
   Username: root  # 填写你的数据库账号
-  Password: 123456  # 填写你的数据库密码
+  Password: root  # 填写你的数据库密码
   Host: mysql:3306
-  DBName: gocorn
+  DBName: go_cron
   Charset: utf8mb4
   ParseTime: True
   MaxIdleConns: 10
