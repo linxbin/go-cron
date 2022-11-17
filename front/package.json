@@ -90,6 +90,6 @@
     }
   },
   "gitHooks": {
-    "pre-commit": "cd ..  && cd /front && lint-staged"
+    "pre-commit": "cd ../  && front/lint-staged"
   }
 }
