@@ -6,7 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "prepare": "cd ..  && husky install front/.husky"
+    "lint": "vue-cli-service lint",
+    "build:preview": "vue-cli-service build --mode preview",
+    "lint:nofix": "vue-cli-service lint --no-fix",
+    "lint:js": "eslint src/**/*.js --fix",
+    "lint:css": "stylelint src/**/*.*ss --fix  --custom-syntax postcss-less",
+    "prepare": "cd ..  && husky install front/.husky && cd front"
   },
   "dependencies": {
     "@ant-design-vue/pro-layout": "^1.0.11",
@@ -85,6 +90,6 @@
     }
   },
   "gitHooks": {
-    "pre-commit": "lint-staged"
+    "pre-commit": "cd ..  && cd /front && lint-staged"
   }
 }
