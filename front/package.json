@@ -11,7 +11,7 @@
     "lint:nofix": "vue-cli-service lint --no-fix",
     "lint:js": "eslint src/**/*.js --fix",
     "lint:css": "stylelint src/**/*.*ss --fix  --custom-syntax postcss-less",
-    "prepare": "cd ..  && husky install front/.husky && cd front"
+    "prepare": "cd ..  && husky install front/.husky"
   },
   "dependencies": {
     "@ant-design-vue/pro-layout": "^1.0.11",
@@ -90,6 +90,6 @@
     }
   },
   "gitHooks": {
-    "pre-commit": "cd ../  && front/lint-staged"
+    "pre-commit": "cd ..  && cd /front && lint-staged"
   }
 }
