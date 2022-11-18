@@ -5,7 +5,7 @@ services:
     image: "mysql:5.7.40"
     container_name: mysql
     ports:
-      - "3306:3306"
+      - "33061:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "go_cron"
@@ -20,3 +20,12 @@ services:
     command: sh -c "./wait-for-it.sh mysql:3306 -- ./cron-server ./configs/config.yaml"
     ports:
       - "8888:8888"
+  front:
+    build: ./front
+    container_name: front
+    depends_on:
+      - mysql
+      - server
+    ports:
+      - "8800:80"
+

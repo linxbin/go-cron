@@ -10,6 +10,8 @@ FROM nginx
 
 WORKDIR /usr/share/nginx/html
 
+COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=Builder /app/dist /usr/share/nginx/html/
 
 EXPOSE 80

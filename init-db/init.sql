@@ -46,3 +46,5 @@ CREATE TABLE `user` (
   `is_del` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否被删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+INSERT INTO `user`(`id`, `username`, `password`, `salt`, `created`, `updated`, `is_del`) VALUES (1, 'admin', '806583ccf213bbd55e7096db5ce105cc', 'qwert', NOW(), NOW(), 0);
