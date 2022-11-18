@@ -16,7 +16,6 @@ COPY . .
 
 RUN go build -o cron-server .
 
-
 FROM debian:stretch-slim
 COPY ./wait-for-it.sh /
 COPY ./configs /configs
