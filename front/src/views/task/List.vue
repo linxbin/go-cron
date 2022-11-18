@@ -199,7 +199,7 @@ export default {
     },
 
     goTaskLog (id) {
-      this.$router.push({ name: 'TaskLogList', params: { id: id } })
+      this.$router.push({ path: `/task-log/list/${id}` })
     },
 
     goAdd () {

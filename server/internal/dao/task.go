@@ -21,7 +21,7 @@ type TaskForm struct {
 	Status        uint8 `binding:"oneof=0 1"`
 }
 
-func (d *Dao) CreateTask(form TaskForm) error {
+func (d *Dao) CreateTask(form TaskForm) (*model.Task, error) {
 	task := model.Task{
 		Name:          form.Name,
 		Spec:          form.Spec,
@@ -34,7 +34,13 @@ func (d *Dao) CreateTask(form TaskForm) error {
 		Model:         &model.Model{Created: time.Now(), Updated: time.Now()},
 	}
 
-	return task.Create(d.engine)
+	err := task.Create(d.engine)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &task, nil
 }
 
 func (d *Dao) UpdateTask(id uint32, form TaskForm) error {

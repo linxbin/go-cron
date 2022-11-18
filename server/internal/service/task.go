@@ -49,7 +49,12 @@ func (svc *Service) CreateTask(request *TaskFormRequest) error {
 		Status:        request.Status,
 	}
 
-	return svc.dao.CreateTask(form)
+	task, err := svc.dao.CreateTask(form)
+	if err != nil {
+		return err
+	}
+
+	return svc.cron.AddTask(task)
 }
 
 func (svc *Service) UpdateTask(request *UpDateTaskRequest) error {
