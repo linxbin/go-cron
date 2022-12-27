@@ -4,16 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/linxbin/corn-service/internal/utils"
+	"github.com/linxbin/cron-service/internal/utils"
 	"runtime"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/jakecoffman/cron"
-	"github.com/linxbin/corn-service/global"
-	"github.com/linxbin/corn-service/internal/dao"
-	"github.com/linxbin/corn-service/internal/model"
+	"github.com/linxbin/cron-service/global"
+	"github.com/linxbin/cron-service/internal/dao"
+	"github.com/linxbin/cron-service/internal/model"
 )
 
 type Cron struct {

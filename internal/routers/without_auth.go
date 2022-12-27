@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	v1 "github.com/linxbin/corn-service/internal/routers/api/v1"
+	v1 "github.com/linxbin/cron-service/internal/routers/api/v1"
 )
 
 // InitWithoutAuthRouter 索引路由

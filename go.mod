@@ -1,4 +1,4 @@
-module github.com/linxbin/corn-service
+module github.com/linxbin/cron-service
 
 go 1.18
 

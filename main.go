@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/linxbin/corn-service/internal/cron"
+	"github.com/linxbin/cron-service/internal/cron"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/corn-service/global"
-	"github.com/linxbin/corn-service/internal/model"
-	"github.com/linxbin/corn-service/internal/routers"
-	"github.com/linxbin/corn-service/pkg/logger"
-	"github.com/linxbin/corn-service/pkg/setting"
+	"github.com/linxbin/cron-service/global"
+	"github.com/linxbin/cron-service/internal/model"
+	"github.com/linxbin/cron-service/internal/routers"
+	"github.com/linxbin/cron-service/pkg/logger"
+	"github.com/linxbin/cron-service/pkg/setting"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 

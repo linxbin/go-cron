@@ -1,10 +1,10 @@
 package service
 
 import (
-	"github.com/linxbin/corn-service/global"
-	"github.com/linxbin/corn-service/internal/dao"
-	"github.com/linxbin/corn-service/internal/model"
-	"github.com/linxbin/corn-service/pkg/app"
+	"github.com/linxbin/cron-service/global"
+	"github.com/linxbin/cron-service/internal/dao"
+	"github.com/linxbin/cron-service/internal/model"
+	"github.com/linxbin/cron-service/pkg/app"
 )
 
 type TaskFormRequest struct {

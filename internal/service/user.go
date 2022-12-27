@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/corn-service/pkg/app"
+	"github.com/linxbin/cron-service/pkg/app"
 )
 
 type UserLoginRequest struct {

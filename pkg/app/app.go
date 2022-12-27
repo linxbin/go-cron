@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/corn-service/pkg/errcode"
+	"github.com/linxbin/cron-service/pkg/errcode"
 )
 
 type Response struct {

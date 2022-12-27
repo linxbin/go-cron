@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"github.com/linxbin/corn-service/internal/model"
-	"github.com/linxbin/corn-service/pkg/app"
+	"github.com/linxbin/cron-service/internal/model"
+	"github.com/linxbin/cron-service/pkg/app"
 	"strings"
 	"time"
 )

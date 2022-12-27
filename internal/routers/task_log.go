@@ -2,8 +2,8 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/corn-service/internal/middleware"
-	v1 "github.com/linxbin/corn-service/internal/routers/api/v1"
+	"github.com/linxbin/cron-service/internal/middleware"
+	v1 "github.com/linxbin/cron-service/internal/routers/api/v1"
 )
 
 // InitTaskLogRouter 索引路由

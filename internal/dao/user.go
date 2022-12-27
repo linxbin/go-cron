@@ -2,8 +2,8 @@ package dao
 
 import (
 	"errors"
-	"github.com/linxbin/corn-service/internal/model"
-	"github.com/linxbin/corn-service/pkg/util"
+	"github.com/linxbin/cron-service/internal/model"
+	"github.com/linxbin/cron-service/pkg/util"
 )
 
 func (d *Dao) MatchUser(username, password string) (*model.User, error) {

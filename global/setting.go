@@ -1,8 +1,8 @@
 package global
 
 import (
-	"github.com/linxbin/corn-service/pkg/logger"
-	"github.com/linxbin/corn-service/pkg/setting"
+	"github.com/linxbin/cron-service/pkg/logger"
+	"github.com/linxbin/cron-service/pkg/setting"
 )
 
 var (

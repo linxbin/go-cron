@@ -3,8 +3,8 @@ package middleware
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/corn-service/pkg/app"
-	"github.com/linxbin/corn-service/pkg/errcode"
+	"github.com/linxbin/cron-service/pkg/app"
+	"github.com/linxbin/cron-service/pkg/errcode"
 	"strings"
 )
 

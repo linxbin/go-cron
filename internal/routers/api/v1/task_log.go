@@ -2,11 +2,11 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/corn-service/global"
-	"github.com/linxbin/corn-service/internal/service"
-	"github.com/linxbin/corn-service/pkg/app"
-	"github.com/linxbin/corn-service/pkg/convert"
-	"github.com/linxbin/corn-service/pkg/errcode"
+	"github.com/linxbin/cron-service/global"
+	"github.com/linxbin/cron-service/internal/service"
+	"github.com/linxbin/cron-service/pkg/app"
+	"github.com/linxbin/cron-service/pkg/convert"
+	"github.com/linxbin/cron-service/pkg/errcode"
 )
 
 type TaskLog struct{}

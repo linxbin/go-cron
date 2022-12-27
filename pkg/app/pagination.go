@@ -2,8 +2,8 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/corn-service/global"
-	"github.com/linxbin/corn-service/pkg/convert"
+	"github.com/linxbin/cron-service/global"
+	"github.com/linxbin/cron-service/pkg/convert"
 )
 
 func GetPage(c *gin.Context) int {

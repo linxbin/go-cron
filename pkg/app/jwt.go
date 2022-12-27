@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/linxbin/corn-service/global"
+	"github.com/linxbin/cron-service/global"
 	"time"
 )
 

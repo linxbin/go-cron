@@ -6,8 +6,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/linxbin/corn-service/global"
-	"github.com/linxbin/corn-service/pkg/setting"
+	"github.com/linxbin/cron-service/global"
+	"github.com/linxbin/cron-service/pkg/setting"
 )
 
 type CommonMap map[string]interface{}
