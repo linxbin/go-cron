@@ -25,10 +25,10 @@ COPY --from=builder /build/configs /configs
 COPY --from=builder /build/server /
 
 RUN set -eux; \
-#	apt-get update; \
-#	apt-get install -y \
-#		--no-install-recommends \
-#		netcat; \
+	apt-get update; \
+	apt-get install -y \
+		--no-install-recommends \
+		netcat; \
         chmod 755 wait-for-it.sh
 
 
