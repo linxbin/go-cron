@@ -4,8 +4,6 @@ services:
   mysql:
     image: "mysql:5.7.40"
     container_name: mysql
-    ports:
-      - "33061:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "go_cron"
@@ -13,15 +11,15 @@ services:
     volumes:
       - ./init-db/:/docker-entrypoint-initdb.d/
   server:
-    build: ./server
+    build: ./
     container_name: server
     depends_on:
       - mysql
-    command: sh -c "./wait-for-it.sh mysql:3306 -- ./cron-server ./configs/config.yaml"
+    command: sh -c "./wait-for-it.sh mysql:3306 -- ./server ./configs/config.yaml"
     ports:
       - "8888:8888"
   front:
-    build: ./front
+    build: ./assets
     container_name: front
     depends_on:
       - mysql
