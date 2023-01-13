@@ -12,7 +12,8 @@ func InitTaskLogRouter(Router *gin.RouterGroup) {
 	router := Router.Group("task-log")
 	router.Use(middleware.JWT())
 	{
-		router.GET("/list/:task_id", taskLog.List) // 任务列表
-		router.GET("/detail/:id", taskLog.Detail)  // 任务详情
+		router.GET("/list/:task_id", taskLog.List) // 任务日志列表
+		router.GET("/detail/:id", taskLog.Detail)  // 任务日志详情
+		router.POST("/clear", taskLog.Clear)       // 清空任务日志
 	}
 }

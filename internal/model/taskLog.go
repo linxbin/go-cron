@@ -62,6 +62,10 @@ func (tg *TaskLog) List(db *gorm.DB, taskId uint32, pageOffset, pageSize int) ([
 	return taskLogs, nil
 }
 
+func (tg *TaskLog) Clear(db *gorm.DB, taskId uint32) error {
+	return db.Where("task_id = ? and is_del != ?", taskId, IsDelete).Delete(&TaskLog{}).Error
+}
+
 func (tg *TaskLog) Detail(db *gorm.DB, ID uint32) (TaskLog, error) {
 	taskLog := TaskLog{}
 	var err error

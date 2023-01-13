@@ -63,3 +63,22 @@ func (tl TaskLog) Detail(c *gin.Context) {
 	}
 	response.ToResponse(taskLog)
 }
+
+func (tl TaskLog) Clear(c *gin.Context) {
+	params := service.TaskLogListRequest{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &params)
+	if !valid {
+		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+	svc := service.New(c.Request.Context())
+	err := svc.ClearTaskLog(params.TaskId)
+	if err != nil {
+		global.Logger.Errorf("svc.ClearTaskLog err: %v", err)
+		response.ToErrorResponse(errcode.ErrorTaskLogDetailFail)
+		return
+	}
+	response.ToResponse(gin.H{})
+}

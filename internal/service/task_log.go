@@ -24,3 +24,7 @@ func (svc *Service) TaskLogList(request *TaskLogListRequest, pager *app.Pager) (
 func (svc *Service) TaskLogDetail(id uint32) (model.TaskLog, error) {
 	return svc.dao.TaskLogDetail(id)
 }
+
+func (svc *Service) ClearTaskLog(taskId uint32) error {
+	return svc.dao.ClearTaskLog(taskId)
+}

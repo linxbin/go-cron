@@ -69,3 +69,8 @@ func (d *Dao) TaskLogDetail(id uint32) (model.TaskLog, error) {
 	var taskLog model.TaskLog
 	return taskLog.Detail(d.engine, id)
 }
+
+func (d *Dao) ClearTaskLog(taskId uint32) error {
+	taskLog := model.TaskLog{}
+	return taskLog.Clear(d.engine, taskId)
+}
