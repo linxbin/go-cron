@@ -2,6 +2,8 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/linxbin/cron-service/pkg/app"
+	"github.com/linxbin/cron-service/pkg/errcode"
 	"net/http"
 )
 
@@ -10,6 +12,10 @@ func NewRouter() *gin.Engine {
 	r.Use(Cors()) // 默认跨域
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.NoRoute(func(context *gin.Context) {
+		response := app.NewResponse(context)
+		response.ToErrorResponse(errcode.NotFound)
+	})
 
 	group := r.Group("/api/v1")
 	{
