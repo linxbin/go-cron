@@ -73,8 +73,19 @@ func (svc *Service) UpdateTask(request *UpDateTaskRequest) error {
 		Remark:        request.Remark,
 		Status:        request.Status,
 	}
-
-	return svc.dao.UpdateTask(request.ID, form)
+	tx := svc.engine.Begin()
+	task, err = svc.dao.UpdateTask(request.ID, form)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	err = svc.cron.RemoveAndAddTask(task)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 func (svc *Service) CountTask(request *CountTaskRequest) (int, error) {
@@ -99,7 +110,7 @@ func (svc *Service) TaskDetail(id uint32) (task *model.Task, err error) {
 }
 
 func (svc *Service) EnableTask(id uint32) error {
-	err := svc.dao.EnableTask(id)
+	_, err := svc.dao.EnableTask(id)
 	if err != nil {
 		return err
 	}
@@ -124,7 +135,7 @@ func (svc *Service) addTaskToTimer(id uint32) error {
 }
 
 func (svc *Service) DisableTask(id uint32) error {
-	err := svc.dao.DisableTask(id)
+	_, err := svc.dao.DisableTask(id)
 	if err != nil {
 		return err
 	}

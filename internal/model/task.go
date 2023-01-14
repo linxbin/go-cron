@@ -34,11 +34,11 @@ func (t *Task) Create(db *gorm.DB) error {
 	return db.Create(&t).Error
 }
 
-func (t *Task) Update(db *gorm.DB, values interface{}) error {
+func (t *Task) Update(db *gorm.DB, values interface{}) (*Task, error) {
 	if err := db.Model(t).Where("id = ? AND is_del != ?", t.ID, IsDelete).Updates(values).Error; err != nil {
-		return err
+		return t, err
 	}
-	return nil
+	return t, nil
 }
 
 func (t *Task) Delete(db *gorm.DB) error {

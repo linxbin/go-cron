@@ -43,7 +43,7 @@ func (d *Dao) CreateTask(form TaskForm) (*model.Task, error) {
 	return &task, nil
 }
 
-func (d *Dao) UpdateTask(id uint32, form TaskForm) error {
+func (d *Dao) UpdateTask(id uint32, form TaskForm) (*model.Task, error) {
 	task := model.Task{
 		Model: &model.Model{ID: id},
 	}
@@ -106,7 +106,7 @@ func (d *Dao) TaskDetail(id uint32) (*model.Task, error) {
 	return task.Detail(d.engine, id)
 }
 
-func (d *Dao) EnableTask(id uint32) error {
+func (d *Dao) EnableTask(id uint32) (*model.Task, error) {
 	task := model.Task{
 		Model: &model.Model{ID: id},
 	}
@@ -116,7 +116,7 @@ func (d *Dao) EnableTask(id uint32) error {
 	return task.Update(d.engine, values)
 }
 
-func (d *Dao) DisableTask(id uint32) error {
+func (d *Dao) DisableTask(id uint32) (*model.Task, error) {
 	task := model.Task{
 		Model: &model.Model{ID: id},
 	}
