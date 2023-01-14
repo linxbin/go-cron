@@ -11,9 +11,9 @@ type TaskFormRequest struct {
 	Name          string `form:"name" binding:"required,min=0,max=32"`
 	Spec          string `form:"spec" binding:"required,min=0,max=64"`
 	Command       string `form:"command" binding:"required,min=0,max=255"`
-	Timeout       uint16 `form:"timeout" binding:"required,gte=1,lte=86400"`
-	RetryTimes    uint8  `form:"retryTimes" binding:"required,gte=0"`
-	RetryInterval uint16 `form:"retryInterval" binding:"required,gte=1"`
+	Timeout       uint16 `form:"timeout" binding:"gte=0,lte=86400"`
+	RetryTimes    uint8  `form:"retryTimes" binding:"gte=0"`
+	RetryInterval uint16 `form:"retryInterval" binding:"gte=0"`
 	Remark        string `form:"remark" binding:"min=0,max=255"`
 	Status        uint8  `form:"status" binding:"oneof=10 20"`
 }
