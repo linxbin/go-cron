@@ -29,8 +29,12 @@ RUN set -eux; \
 	apt-get install -y \
 		--no-install-recommends \
 		netcat; \
-        chmod 755 wait-for-it.sh
+    apt-get install -y  \
+        --no-install-recommends  \
+        dos2unix; \
+    dos2unix wait-for-it.sh; \
+    chmod 755 wait-for-it.sh
 
 
 # 需要运行的命令
-#ENTRYPOINT ["/cron-server"]
+#ENTRYPOINT ["/server"]
