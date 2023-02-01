@@ -3,7 +3,7 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/linxbin/cron-service/global"
-	"github.com/linxbin/cron-service/internal/service"
+	"github.com/linxbin/cron-service/internal/service/task"
 	"github.com/linxbin/cron-service/pkg/app"
 	"github.com/linxbin/cron-service/pkg/convert"
 	"github.com/linxbin/cron-service/pkg/errcode"
@@ -16,7 +16,7 @@ func NewTask() Task {
 }
 
 func (t *Task) Create(c *gin.Context) {
-	param := service.TaskFormRequest{}
+	param := task.FormRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &param)
 	if !valid {
@@ -25,8 +25,7 @@ func (t *Task) Create(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
-	if err := svc.CreateTask(&param); err != nil {
+	if err := task.Create(&param); err != nil {
 		global.Logger.Errorf("svc.CreateTask err: %v", err)
 		response.ToErrorResponse(errcode.ErrorCreateTaskFail)
 		return
@@ -36,7 +35,7 @@ func (t *Task) Create(c *gin.Context) {
 }
 
 func (t *Task) Update(c *gin.Context) {
-	params := service.UpDateTaskRequest{}
+	params := task.UpdateTaskRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -45,8 +44,7 @@ func (t *Task) Update(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
-	if err := svc.UpdateTask(&params); err != nil {
+	if err := task.Update(&params); err != nil {
 		global.Logger.Errorf("svc.UpdateTask err: %v", err)
 		response.ToErrorResponse(errcode.ErrorUpdateTaskFail)
 		return
@@ -56,7 +54,7 @@ func (t *Task) Update(c *gin.Context) {
 }
 
 func (t *Task) List(c *gin.Context) {
-	params := service.TaskListRequest{Name: convert.StrTo(c.Param("name")).String(), Status: uint8(convert.StrTo(c.Param("status")).MustInt())}
+	params := task.ListRequest{Name: convert.StrTo(c.Param("name")).String(), Status: uint8(convert.StrTo(c.Param("status")).MustInt())}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -65,16 +63,15 @@ func (t *Task) List(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
 	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
-	totalRows, err := svc.CountTask(&service.CountTaskRequest{Name: params.Name, Status: params.Status})
+	totalRows, err := task.Count(&task.CountRequest{Name: params.Name, Status: params.Status})
 	if err != nil {
 		global.Logger.Errorf("svc.CountTag err: %v", err)
 		response.ToErrorResponse(errcode.ErrorCountTaskFail)
 		return
 	}
 
-	tags, err := svc.TaskList(&params, &pager)
+	tags, err := task.List(&params, &pager)
 	if err != nil {
 		global.Logger.Errorf("svc.GetTagList err: %v", err)
 		response.ToErrorResponse(errcode.ErrorGetTaskListFail)
@@ -85,7 +82,7 @@ func (t *Task) List(c *gin.Context) {
 }
 
 func (t *Task) Delete(c *gin.Context) {
-	params := service.TaskRequest{}
+	params := task.IDRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -93,8 +90,8 @@ func (t *Task) Delete(c *gin.Context) {
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
-	svc := service.New(c.Request.Context())
-	if err := svc.DeleteTask(&params); err != nil {
+
+	if err := task.Delete(&params); err != nil {
 		global.Logger.Errorf("svc.UpdateTask err: %v", err)
 		response.ToErrorResponse(errcode.ErrorDeleteTaskFail)
 		return
@@ -105,7 +102,7 @@ func (t *Task) Delete(c *gin.Context) {
 }
 
 func (t *Task) Detail(c *gin.Context) {
-	params := service.TaskRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
+	params := task.IDRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -113,17 +110,16 @@ func (t *Task) Detail(c *gin.Context) {
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
-	svc := service.New(c.Request.Context())
-	if task, err := svc.TaskDetail(params.ID); err != nil {
+	if t, err := task.Detail(params.ID); err != nil {
 		global.Logger.Errorf("svc.TaskDetail err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskNotFound)
 	} else {
-		response.ToResponse(gin.H{"data": task})
+		response.ToResponse(gin.H{"data": t})
 	}
 }
 
 func (t *Task) Enable(c *gin.Context) {
-	params := service.TaskRequest{}
+	params := task.IDRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -131,8 +127,7 @@ func (t *Task) Enable(c *gin.Context) {
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
-	svc := service.New(c.Request.Context())
-	if err := svc.EnableTask(params.ID); err != nil {
+	if err := task.Enable(params.ID); err != nil {
 		global.Logger.Errorf("svc.EnableTask err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskEnable)
 	} else {
@@ -141,7 +136,7 @@ func (t *Task) Enable(c *gin.Context) {
 }
 
 func (t *Task) Disable(c *gin.Context) {
-	params := service.TaskRequest{}
+	params := task.IDRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -149,8 +144,8 @@ func (t *Task) Disable(c *gin.Context) {
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
-	svc := service.New(c.Request.Context())
-	if err := svc.DisableTask(params.ID); err != nil {
+
+	if err := task.Disable(params.ID); err != nil {
 		global.Logger.Errorf("svc.DisableTask err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskDisable)
 	} else {

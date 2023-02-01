@@ -12,13 +12,10 @@ import (
 
 	"github.com/jakecoffman/cron"
 	"github.com/linxbin/cron-service/global"
-	"github.com/linxbin/cron-service/internal/dao"
 	"github.com/linxbin/cron-service/internal/model"
 )
 
-type Cron struct {
-	dao *dao.Dao
-}
+type Cron struct{}
 
 // TaskCount 任务计数
 type TaskCount struct {
@@ -45,10 +42,8 @@ func (tc *TaskCount) Wait() {
 	close(tc.exit)
 }
 
-func NewCron() Cron {
-	return Cron{
-		dao: dao.New(global.DBEngine),
-	}
+func NewCron() *Cron {
+	return &Cron{}
 }
 
 var (
@@ -63,8 +58,9 @@ func (c *Cron) Initialize() error {
 	page := 1
 	pageSize := 1000
 	maxPage := 1000
+	var t model.Task
 	for page < maxPage {
-		taskList, err := c.dao.TaskActiveList(page, pageSize)
+		taskList, err := t.ActiveList(page, pageSize)
 		if err != nil {
 			return err
 		}
@@ -149,8 +145,8 @@ func beforeExecJob(task *model.Task) (taskLogId uint32, err error) {
 	return taskLogId, nil
 }
 
-func createTaskLog(task *model.Task) (id uint32, err error) {
-	taskLogForm := dao.TaskLogForm{
+func createTaskLog(task *model.Task) (uint32, error) {
+	tl := model.TaskLog{
 		TaskId:     task.ID,
 		Name:       task.Name,
 		Spec:       task.Spec,
@@ -161,26 +157,30 @@ func createTaskLog(task *model.Task) (id uint32, err error) {
 		EndTime:    time.Now(),
 		Status:     model.TaskLogStatusRunning,
 	}
-	d := dao.New(global.DBEngine)
-	return d.CreateTaskLog(taskLogForm)
+	err := tl.Create()
+	if err != nil {
+		return 0, err
+	}
+	return tl.ID, nil
 }
 
 func updateTaskLog(taskLogId uint32, result TaskResult) error {
-	d := dao.New(global.DBEngine)
 	var status int
 	if result.Err != nil {
 		status = model.TaskLogStatusFailure
 	} else {
 		status = model.TaskLogStatusComplete
 	}
-	fmt.Println(status)
 	values := model.CommonMap{
 		"status":      status,
 		"end_time":    time.Now(),
 		"retry_times": result.RetryTimes,
 		"result":      result.Result,
 	}
-	return d.UpdateTaskLog(taskLogId, values)
+	tl := model.TaskLog{
+		Model: &model.Model{ID: taskLogId},
+	}
+	return tl.Update(values)
 }
 
 // 任务执行后置操作

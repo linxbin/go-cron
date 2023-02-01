@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
+	"github.com/linxbin/cron-service/global"
 )
 
 type Task struct {
@@ -30,50 +30,56 @@ func (t *Task) TableName() string {
 	return "task"
 }
 
-func (t *Task) Create(db *gorm.DB) error {
-	return db.Create(&t).Error
+func (t *Task) Create() (*Task, error) {
+	err := global.DBEngine.Create(t).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return t, nil
 }
 
-func (t *Task) Update(db *gorm.DB, values interface{}) (*Task, error) {
-	if err := db.Model(t).Where("id = ? AND is_del != ?", t.ID, IsDelete).Updates(values).Error; err != nil {
+func (t *Task) Update(values interface{}) (*Task, error) {
+	if err := global.DBEngine.Model(t).Where("is_del != ?", IsDelete).Updates(values).Error; err != nil {
 		return t, err
 	}
 	return t, nil
 }
 
-func (t *Task) Delete(db *gorm.DB) error {
-	return db.Where("id = ? AND is_del != ?", t.Model.ID, IsDelete).Delete(&t).Error
+func (t *Task) Delete() error {
+	return global.DBEngine.Where("id = ? AND is_del != ?", t.Model.ID, IsDelete).Delete(&t).Error
 }
 
-func (t *Task) Count(db *gorm.DB) (int, error) {
+func (t *Task) Count() (int, error) {
 	var count int
 	if t.Name != "" {
-		db = db.Where("name = ?", t.Name)
+		global.DBEngine.Where("name = ?", t.Name)
 	}
 	if t.Status != 0 {
-		db = db.Where("status = ?", t.Status)
+		global.DBEngine.Where("status = ?", t.Status)
 	}
-	if err := db.Model(&t).Where("is_del != ?", IsDelete).Count(&count).Error; err != nil {
+	if err := global.DBEngine.Model(&t).Where("is_del != ?", IsDelete).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
 	return count, nil
 }
 
-func (t *Task) List(db *gorm.DB, pageOffset, pageSize int) ([]*TaskList, error) {
+func (t *Task) List(pageOffset, pageSize int) ([]*TaskList, error) {
 	var tasks []*TaskList
 	var err error
 	if pageOffset >= 0 && pageSize > 0 {
-		db = db.Offset(pageOffset).Limit(pageSize)
+		global.DBEngine.Offset(pageOffset).Limit(pageSize)
 	}
 	if t.Name != "" {
-		db = db.Where("name = ?", t.Name)
+		global.DBEngine.Where("name = ?", t.Name)
 	}
 	if t.Status != 0 {
-		db = db.Where("status = ?", t.Status)
+		global.DBEngine.Where("status = ?", t.Status)
 	}
 
-	if err = db.Where("is_del != ?", IsDelete).Order("id desc").Find(&tasks).Error; err != nil {
+	if err = global.DBEngine.Where("is_del != ?", IsDelete).Order("id desc").Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 
@@ -84,27 +90,48 @@ func (t *Task) List(db *gorm.DB, pageOffset, pageSize int) ([]*TaskList, error) 
 	return tasks, nil
 }
 
-func (t *Task) Detail(db *gorm.DB, ID uint32) (*Task, error) {
-	task := &Task{}
+func (t *Task) Detail(ID uint32) (*Task, error) {
 	var err error
 
-	if err = db.First(&task, "id = ? and is_del != ?", ID, IsDelete).Error; err != nil {
+	if err = global.DBEngine.First(t, "id = ? and is_del != ?", ID, IsDelete).Error; err != nil {
 		return nil, err
 	}
-	return task, nil
+	return t, nil
 }
 
-func (t *Task) ActiveList(db *gorm.DB, pageOffset, pageSize int) ([]*Task, error) {
+func (t *Task) ActiveList(pageOffset, pageSize int) ([]*Task, error) {
 	var tasks []*Task
 	var err error
 	if pageOffset >= 0 && pageSize > 0 {
-		db = db.Offset(pageOffset).Limit(pageSize)
+		global.DBEngine.Offset(pageOffset).Limit(pageSize)
 	}
-	db = db.Where("status = ?", TaskStatusEnable)
+	global.DBEngine.Where("status = ?", TaskStatusEnable)
 
-	if err = db.Where("is_del != ?", IsDelete).Find(&tasks).Error; err != nil {
+	if err = global.DBEngine.Where("is_del != ?", IsDelete).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 
 	return tasks, nil
+}
+
+func (t *Task) Enable() error {
+	values := CommonMap{
+		"status": TaskStatusEnable,
+	}
+	_, err := t.Update(values)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *Task) Disable() error {
+	values := CommonMap{
+		"status": TaskStatusDisable,
+	}
+	_, err := t.Update(values)
+	if err != nil {
+		return err
+	}
+	return nil
 }

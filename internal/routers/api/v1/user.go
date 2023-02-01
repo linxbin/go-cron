@@ -3,7 +3,7 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/linxbin/cron-service/global"
-	"github.com/linxbin/cron-service/internal/service"
+	"github.com/linxbin/cron-service/internal/service/user"
 	"github.com/linxbin/cron-service/pkg/app"
 	"github.com/linxbin/cron-service/pkg/errcode"
 )
@@ -15,7 +15,7 @@ func NewUser() User {
 }
 
 func (u *User) Login(c *gin.Context) {
-	param := service.UserLoginRequest{}
+	param := user.LoginRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &param)
 	if !valid {
@@ -24,9 +24,7 @@ func (u *User) Login(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
-
-	userInfo, err := svc.Login(&param)
+	userInfo, err := user.Login(&param)
 	if err != nil {
 		global.Logger.Errorf("svc.user login err: %v", err)
 		response.ToErrorResponse(errcode.LoginError)
@@ -37,8 +35,19 @@ func (u *User) Login(c *gin.Context) {
 }
 
 func (u *User) Info(c *gin.Context) {
-	svc := service.New(c.Request.Context())
-	userInfo := svc.GetUserInfo(c)
+	userId, exist := c.Get("userId")
+	if !exist {
+		userId = nil
+	}
+	username, exist := c.Get("username")
+	if !exist {
+		username = nil
+	}
+	userInfo := &user.Info{
+		UserId:   userId,
+		Username: username,
+		RoleId:   "admin",
+	}
 	response := app.NewResponse(c)
 	response.ToResponse(userInfo)
 }

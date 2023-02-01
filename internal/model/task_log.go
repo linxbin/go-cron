@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/linxbin/cron-service/global"
 	"time"
 )
 
@@ -29,51 +30,50 @@ func (tg *TaskLog) TableName() string {
 	return "task_log"
 }
 
-func (tg *TaskLog) Create(db *gorm.DB) error {
-	return db.Create(&tg).Error
+func (tg *TaskLog) Create() error {
+	return global.DBEngine.Create(&tg).Error
 }
 
-func (tg *TaskLog) Update(db *gorm.DB, values interface{}) error {
-	if err := db.Model(tg).Where("id = ? AND is_del != ?", tg.ID, IsDelete).Updates(values).Error; err != nil {
+func (tg *TaskLog) Update(values interface{}) error {
+	if err := global.DBEngine.Model(tg).Where("id = ? AND is_del != ?", tg.ID, IsDelete).Updates(values).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (tg *TaskLog) Count(db *gorm.DB, taskId uint32) (int, error) {
+func (tg *TaskLog) Count() (int, error) {
 	var count int
-	if err := db.Model(&tg).Where("task_id = ? and is_del != ?", taskId, IsDelete).Count(&count).Error; err != nil {
+	if err := global.DBEngine.Model(&tg).Where("task_id = ? and is_del != ?", tg.TaskId, IsDelete).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
 	return count, nil
 }
 
-func (tg *TaskLog) List(db *gorm.DB, taskId uint32, pageOffset, pageSize int) ([]*TaskLog, error) {
+func (tg *TaskLog) List(pageOffset, pageSize int) ([]*TaskLog, error) {
 	var taskLogs []*TaskLog
 	var err error
 	if pageOffset >= 0 && pageSize > 0 {
-		db = db.Offset(pageOffset).Limit(pageSize)
+		global.DBEngine.Offset(pageOffset).Limit(pageSize)
 	}
-	if err = db.Where("task_id = ? and is_del != ?", taskId, IsDelete).Order("id desc").Find(&taskLogs).Error; err != nil {
+	if err = global.DBEngine.Where("task_id = ? and is_del != ?", tg.TaskId, IsDelete).Order("id desc").Find(&taskLogs).Error; err != nil {
 		return nil, err
 	}
 
 	return taskLogs, nil
 }
 
-func (tg *TaskLog) Clear(db *gorm.DB, taskId uint32) error {
-	return db.Where("task_id = ? and is_del != ?", taskId, IsDelete).Delete(&TaskLog{}).Error
+func (tg *TaskLog) Clear() error {
+	return global.DBEngine.Where("task_id = ? and is_del != ?", tg.TaskId, IsDelete).Delete(&TaskLog{}).Error
 }
 
-func (tg *TaskLog) Detail(db *gorm.DB, ID uint32) (TaskLog, error) {
-	taskLog := TaskLog{}
+func (tg *TaskLog) Detail() (*TaskLog, error) {
 	var err error
 
-	if err = db.First(&taskLog, "id = ? and is_del != ?", ID, IsDelete).Error; err != nil {
-		return taskLog, err
+	if err = global.DBEngine.First(tg, "id = ? and is_del != ?", tg.ID, IsDelete).Error; err != nil {
+		return tg, err
 	}
-	return taskLog, nil
+	return tg, nil
 }
 
 func (tg *TaskLog) BatchDelete(db *gorm.DB, taskId uint32) error {

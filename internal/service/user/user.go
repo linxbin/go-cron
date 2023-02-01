@@ -1,11 +1,11 @@
-package service
+package user
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/linxbin/cron-service/internal/model"
 	"github.com/linxbin/cron-service/pkg/app"
 )
 
-type UserLoginRequest struct {
+type LoginRequest struct {
 	Username string `form:"username" binding:"required,min=0,max=32"`
 	Password string `form:"password" binding:"required,min=0,max=255"`
 }
@@ -16,8 +16,11 @@ type LoginInfo struct {
 	Id       uint32 `json:"id"`
 }
 
-func (svc *Service) Login(request *UserLoginRequest) (*LoginInfo, error) {
-	user, err := svc.dao.MatchUser(request.Username, request.Password)
+func Login(request *LoginRequest) (*LoginInfo, error) {
+	u := &model.User{
+		Username: request.Username,
+	}
+	user, err := u.Match(request.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -25,33 +28,16 @@ func (svc *Service) Login(request *UserLoginRequest) (*LoginInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	u := &LoginInfo{
+	uf := &LoginInfo{
 		Username: user.Username,
 		Id:       user.ID,
 		Token:    token,
 	}
-	return u, nil
+	return uf, nil
 }
 
-type UserInfo struct {
+type Info struct {
 	UserId   interface{} `json:"user_id"`
 	Username interface{} `json:"username"`
 	RoleId   string      `json:"role_id"`
-}
-
-func (svc *Service) GetUserInfo(c *gin.Context) *UserInfo {
-	userId, exist := c.Get("userId")
-	if !exist {
-		userId = nil
-	}
-	username, exist := c.Get("username")
-	if !exist {
-		username = nil
-	}
-
-	return &UserInfo{
-		UserId:   userId,
-		Username: username,
-		RoleId:   "admin",
-	}
 }

@@ -3,7 +3,7 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/linxbin/cron-service/global"
-	"github.com/linxbin/cron-service/internal/service"
+	"github.com/linxbin/cron-service/internal/service/tasklog"
 	"github.com/linxbin/cron-service/pkg/app"
 	"github.com/linxbin/cron-service/pkg/convert"
 	"github.com/linxbin/cron-service/pkg/errcode"
@@ -16,7 +16,7 @@ func NewTaskLog() TaskLog {
 }
 
 func (tl TaskLog) List(c *gin.Context) {
-	params := service.TaskLogListRequest{TaskId: convert.StrTo(c.Param("task_id")).MustUInt32()}
+	params := tasklog.ListRequest{TaskId: convert.StrTo(c.Param("task_id")).MustUInt32()}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -25,16 +25,15 @@ func (tl TaskLog) List(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
 	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
-	totalRows, err := svc.CountTaskLog(params.TaskId)
+	totalRows, err := tasklog.Count(params.TaskId)
 	if err != nil {
 		global.Logger.Errorf("svc.CountTag err: %v", err)
 		response.ToErrorResponse(errcode.ErrorCountTaskFail)
 		return
 	}
 
-	tags, err := svc.TaskLogList(&params, &pager)
+	tags, err := tasklog.List(&params, &pager)
 	if err != nil {
 		global.Logger.Errorf("svc.GetTagLogList err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskLogListFail)
@@ -46,7 +45,7 @@ func (tl TaskLog) List(c *gin.Context) {
 }
 
 func (tl TaskLog) Detail(c *gin.Context) {
-	params := service.TaskLogDetailRequest{Id: convert.StrTo(c.Param("id")).MustUInt32()}
+	params := tasklog.DetailRequest{Id: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -54,8 +53,8 @@ func (tl TaskLog) Detail(c *gin.Context) {
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
-	svc := service.New(c.Request.Context())
-	taskLog, err := svc.TaskLogDetail(params.Id)
+
+	taskLog, err := tasklog.Detail(params.Id)
 	if err != nil {
 		global.Logger.Errorf("svc.GetTaskLogDetail err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskLogDetailFail)
@@ -65,7 +64,7 @@ func (tl TaskLog) Detail(c *gin.Context) {
 }
 
 func (tl TaskLog) Clear(c *gin.Context) {
-	params := service.TaskLogListRequest{}
+	params := tasklog.ListRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
@@ -73,8 +72,7 @@ func (tl TaskLog) Clear(c *gin.Context) {
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
-	svc := service.New(c.Request.Context())
-	err := svc.ClearTaskLog(params.TaskId)
+	err := tasklog.Clear(params.TaskId)
 	if err != nil {
 		global.Logger.Errorf("svc.ClearTaskLog err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskLogDetailFail)
