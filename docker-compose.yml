@@ -9,7 +9,7 @@ services:
       MYSQL_DATABASE: "go_cron"
       LANG: "C.UTF-8"
     volumes:
-      - ./init-db/:/docker-entrypoint-initdb.d/
+      - ./db/:/docker-entrypoint-initdb.d/
     ports:
       - "33061:3306"
   server:
