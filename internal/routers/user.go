@@ -13,6 +13,9 @@ func InitUserRouter(Router *gin.RouterGroup) {
 	router := Router.Group("user")
 	router.Use(middleware.JWT())
 	{
-		router.GET("/info", user.Info) // 获取授权用户信息
+		router.GET("/info", user.Info)      // 获取授权用户信息
+		router.POST("/add", user.Add)       // 新增管理员
+		router.GET("/list", user.List)      // 管理员列表
+		router.POST("/delete", user.Delete) // 管理员列表
 	}
 }

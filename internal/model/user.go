@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"github.com/linxbin/cron-service/global"
 	"github.com/linxbin/cron-service/pkg/util"
 )
@@ -18,19 +17,17 @@ func (u *User) TableName() string {
 	return "user"
 }
 
-func FindByUsername(username string) (*User, error) {
-	user := &User{}
-	if err := global.DBEngine.Where("username = ?", username).First(&user).Error; err != nil {
-		return nil, err
+func (u *User) FindByUsername(username string) *User {
+	if err := global.DBEngine.Where("username = ?", username).First(&u).Error; err != nil {
+		return nil
 	}
-	return user, nil
+	return u
 }
 
 func (u *User) Match(password string) (*User, error) {
-	user, err := FindByUsername(u.Username)
-	fmt.Println(user)
-	if err != nil {
-		return nil, err
+	user := u.FindByUsername(u.Username)
+	if user == nil {
+		return nil, errors.New("user not exist")
 	}
 
 	if user.Password != encryptUserPassword(password, user.Salt) {
@@ -42,4 +39,41 @@ func (u *User) Match(password string) (*User, error) {
 // 密码加密
 func encryptUserPassword(password, salt string) string {
 	return util.EncodeMD5(password + salt)
+}
+
+func (u *User) Count() (int, error) {
+	var count int
+	if err := global.DBEngine.Model(&u).Where("is_del != ?", IsDelete).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (u *User) List(pageOffset, pageSize int) ([]*User, error) {
+	var users []*User
+	var err error
+	if pageOffset >= 0 && pageSize > 0 {
+		global.DBEngine.Offset(pageOffset).Limit(pageSize)
+	}
+
+	if err = global.DBEngine.Where("is_del != ?", IsDelete).Order("id desc").Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func (u *User) Delete() error {
+	return global.DBEngine.Where("id = ? AND is_del != ?", u.Model.ID, IsDelete).Delete(&u).Error
+}
+
+func (u *User) Create() (*User, error) {
+	err := global.DBEngine.Create(u).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
 }

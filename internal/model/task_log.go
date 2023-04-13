@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/linxbin/cron-service/global"
 	"time"
 )
@@ -53,10 +52,11 @@ func (tg *TaskLog) Count() (int, error) {
 func (tg *TaskLog) List(pageOffset, pageSize int) ([]*TaskLog, error) {
 	var taskLogs []*TaskLog
 	var err error
+	query := global.DBEngine.Where("task_id = ? and is_del != ?", tg.TaskId, IsDelete).Order("id desc")
 	if pageOffset >= 0 && pageSize > 0 {
-		global.DBEngine.Offset(pageOffset).Limit(pageSize)
+		query.Offset(pageOffset).Limit(pageSize)
 	}
-	if err = global.DBEngine.Where("task_id = ? and is_del != ?", tg.TaskId, IsDelete).Order("id desc").Find(&taskLogs).Error; err != nil {
+	if err = query.Find(&taskLogs).Error; err != nil {
 		return nil, err
 	}
 
@@ -74,14 +74,4 @@ func (tg *TaskLog) Detail() (*TaskLog, error) {
 		return tg, err
 	}
 	return tg, nil
-}
-
-func (tg *TaskLog) BatchDelete(db *gorm.DB, taskId uint32) error {
-	var values map[string]int
-	values = make(map[string]int)
-	values["is_del"] = IsDelete
-	if err := db.Model(tg).Where("task_id = ? AND is_del != ?", taskId, IsDelete).Updates(values).Error; err != nil {
-		return err
-	}
-	return nil
 }

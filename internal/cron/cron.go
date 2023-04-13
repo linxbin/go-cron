@@ -1,10 +1,10 @@
 package cron
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/linxbin/cron-service/internal/utils"
+	"golang.org/x/net/context"
 	"runtime"
 	"strconv"
 	"sync"
@@ -54,28 +54,24 @@ var (
 func (c *Cron) Initialize() error {
 	serviceCron = cron.New()
 	serviceCron.Start()
-	taskNum := 0
 	page := 1
 	pageSize := 1000
-	maxPage := 1000
 	var t model.Task
-	for page < maxPage {
+	for {
 		taskList, err := t.ActiveList(page, pageSize)
 		if err != nil {
 			return err
 		}
 		if len(taskList) == 0 {
-			break
+			return nil
 		}
 		for _, item := range taskList {
 			if err = c.AddTask(item); err != nil {
 				return err
 			}
-			taskNum++
 		}
 		page++
 	}
-	return nil
 }
 
 func (c *Cron) AddTask(task *model.Task) error {

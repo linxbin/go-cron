@@ -14,7 +14,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o server .
+RUN go build -o server ./cmd/
 
 FROM debian:stretch-slim
 COPY ./wait-for-it.sh /

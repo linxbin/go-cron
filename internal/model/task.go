@@ -53,13 +53,14 @@ func (t *Task) Delete() error {
 
 func (t *Task) Count() (int, error) {
 	var count int
+	query := global.DBEngine.Model(&t).Where("is_del != ?", IsDelete)
 	if t.Name != "" {
-		global.DBEngine.Where("name = ?", t.Name)
+		query.Where("name = ?", t.Name)
 	}
 	if t.Status != 0 {
-		global.DBEngine.Where("status = ?", t.Status)
+		query.Where("status = ?", t.Status)
 	}
-	if err := global.DBEngine.Model(&t).Where("is_del != ?", IsDelete).Count(&count).Error; err != nil {
+	if err := query.Count(&count).Error; err != nil {
 		return 0, err
 	}
 
@@ -69,17 +70,18 @@ func (t *Task) Count() (int, error) {
 func (t *Task) List(pageOffset, pageSize int) ([]*TaskList, error) {
 	var tasks []*TaskList
 	var err error
+	query := global.DBEngine.Where("is_del != ?", IsDelete)
 	if pageOffset >= 0 && pageSize > 0 {
-		global.DBEngine.Offset(pageOffset).Limit(pageSize)
+		query.Offset(pageOffset).Limit(pageSize)
 	}
 	if t.Name != "" {
-		global.DBEngine.Where("name = ?", t.Name)
+		query.Where("name = ?", t.Name)
 	}
 	if t.Status != 0 {
-		global.DBEngine.Where("status = ?", t.Status)
+		query.Where("status = ?", t.Status)
 	}
 
-	if err = global.DBEngine.Where("is_del != ?", IsDelete).Order("id desc").Find(&tasks).Error; err != nil {
+	if err = query.Order("id desc").Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 
@@ -102,12 +104,12 @@ func (t *Task) Detail(ID uint32) (*Task, error) {
 func (t *Task) ActiveList(pageOffset, pageSize int) ([]*Task, error) {
 	var tasks []*Task
 	var err error
+	query := global.DBEngine.Where("status = ? and is_del != ?", TaskStatusEnable, IsDelete)
 	if pageOffset >= 0 && pageSize > 0 {
-		global.DBEngine.Offset(pageOffset).Limit(pageSize)
+		query.Offset(pageOffset).Limit(pageSize)
 	}
-	global.DBEngine.Where("status = ?", TaskStatusEnable)
 
-	if err = global.DBEngine.Where("is_del != ?", IsDelete).Find(&tasks).Error; err != nil {
+	if err = query.Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 

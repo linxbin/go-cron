@@ -2,7 +2,6 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/linxbin/cron-service/global"
 	"github.com/linxbin/cron-service/internal/service/tasklog"
 	"github.com/linxbin/cron-service/pkg/app"
 	"github.com/linxbin/cron-service/pkg/convert"
@@ -20,7 +19,6 @@ func (tl TaskLog) List(c *gin.Context) {
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
-		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
@@ -28,14 +26,12 @@ func (tl TaskLog) List(c *gin.Context) {
 	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
 	totalRows, err := tasklog.Count(params.TaskId)
 	if err != nil {
-		global.Logger.Errorf("svc.CountTag err: %v", err)
 		response.ToErrorResponse(errcode.ErrorCountTaskFail)
 		return
 	}
 
 	tags, err := tasklog.List(&params, &pager)
 	if err != nil {
-		global.Logger.Errorf("svc.GetTagLogList err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskLogListFail)
 		return
 	}
@@ -49,14 +45,12 @@ func (tl TaskLog) Detail(c *gin.Context) {
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
-		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
 
 	taskLog, err := tasklog.Detail(params.Id)
 	if err != nil {
-		global.Logger.Errorf("svc.GetTaskLogDetail err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskLogDetailFail)
 		return
 	}
@@ -68,13 +62,11 @@ func (tl TaskLog) Clear(c *gin.Context) {
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &params)
 	if !valid {
-		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
 	err := tasklog.Clear(params.TaskId)
 	if err != nil {
-		global.Logger.Errorf("svc.ClearTaskLog err: %v", err)
 		response.ToErrorResponse(errcode.ErrorTaskLogDetailFail)
 		return
 	}

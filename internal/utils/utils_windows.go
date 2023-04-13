@@ -4,8 +4,8 @@
 package utils
 
 import (
-	"context"
 	"errors"
+	"golang.org/x/net/context"
 	"os/exec"
 	"strconv"
 	"syscall"

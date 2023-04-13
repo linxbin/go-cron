@@ -51,3 +51,56 @@ func (u *User) Info(c *gin.Context) {
 	response := app.NewResponse(c)
 	response.ToResponse(userInfo)
 }
+
+func (u *User) Add(c *gin.Context) {
+	param := user.AddRequest{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+
+	if err := user.Add(&param); err != nil {
+		global.Logger.Errorf("svc.CreateTask err: %v", err)
+		response.ToErrorResponse(errcode.ErrorCreateTaskFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+}
+
+func (u *User) List(c *gin.Context) {
+	response := app.NewResponse(c)
+	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
+	totalRows, err := user.Count()
+	if err != nil {
+		response.ToErrorResponse(errcode.ErrorCountTaskFail)
+		return
+	}
+
+	tags, err := user.List(&pager)
+	if err != nil {
+		response.ToErrorResponse(errcode.ErrorTaskLogListFail)
+		return
+	}
+
+	response.ToResponseList(tags, totalRows)
+}
+
+func (u *User) Delete(c *gin.Context) {
+	params := user.IDRequest{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &params)
+	if !valid {
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+
+	if err := user.Delete(&params); err != nil {
+		response.ToErrorResponse(errcode.ErrorDeleteTaskFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+}
