@@ -162,16 +162,19 @@ func createTaskLog(task *model.Task) (uint32, error) {
 
 func updateTaskLog(taskLogId uint32, result TaskResult) error {
 	var status int
+	var res string
 	if result.Err != nil {
 		status = model.TaskLogStatusFailure
+		res = result.Err.Error()
 	} else {
 		status = model.TaskLogStatusComplete
+		res = result.Result
 	}
 	values := model.CommonMap{
 		"status":      status,
 		"end_time":    time.Now(),
 		"retry_times": result.RetryTimes,
-		"result":      result.Result,
+		"result":      res,
 	}
 	tl := model.TaskLog{
 		Model: &model.Model{ID: taskLogId},

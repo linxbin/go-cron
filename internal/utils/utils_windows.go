@@ -30,7 +30,7 @@ func ExecShell(ctx context.Context, command string) (string, error) {
 	}()
 	select {
 	case <-ctx.Done():
-		if cmd.Process.Pid > 0 {
+		if cmd.Process != nil && cmd.Process.Pid > 0 {
 			exec.Command("taskkill", "/F", "/T", "/PID", strconv.Itoa(cmd.Process.Pid)).Run()
 			cmd.Process.Kill()
 		}

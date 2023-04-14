@@ -40,13 +40,6 @@ func (t *Task) Create() (*Task, error) {
 	return t, nil
 }
 
-func (t *Task) Update(values interface{}) (*Task, error) {
-	if err := global.DBEngine.Model(t).Where("is_del != ?", IsDelete).Updates(values).Error; err != nil {
-		return t, err
-	}
-	return t, nil
-}
-
 func (t *Task) Delete() error {
 	return global.DBEngine.Where("id = ? AND is_del != ?", t.Model.ID, IsDelete).Delete(&t).Error
 }
@@ -55,10 +48,10 @@ func (t *Task) Count() (int, error) {
 	var count int
 	query := global.DBEngine.Model(&t).Where("is_del != ?", IsDelete)
 	if t.Name != "" {
-		query.Where("name = ?", t.Name)
+		query = query.Where("name = ?", t.Name)
 	}
 	if t.Status != 0 {
-		query.Where("status = ?", t.Status)
+		query = query.Where("status = ?", t.Status)
 	}
 	if err := query.Count(&count).Error; err != nil {
 		return 0, err
@@ -72,13 +65,13 @@ func (t *Task) List(pageOffset, pageSize int) ([]*TaskList, error) {
 	var err error
 	query := global.DBEngine.Where("is_del != ?", IsDelete)
 	if pageOffset >= 0 && pageSize > 0 {
-		query.Offset(pageOffset).Limit(pageSize)
+		query = query.Offset(pageOffset).Limit(pageSize)
 	}
 	if t.Name != "" {
-		query.Where("name = ?", t.Name)
+		query = query.Where("name = ?", t.Name)
 	}
 	if t.Status != 0 {
-		query.Where("status = ?", t.Status)
+		query = query.Where("status = ?", t.Status)
 	}
 
 	if err = query.Order("id desc").Find(&tasks).Error; err != nil {
@@ -106,7 +99,7 @@ func (t *Task) ActiveList(pageOffset, pageSize int) ([]*Task, error) {
 	var err error
 	query := global.DBEngine.Where("status = ? and is_del != ?", TaskStatusEnable, IsDelete)
 	if pageOffset >= 0 && pageSize > 0 {
-		query.Offset(pageOffset).Limit(pageSize)
+		query = query.Offset(pageOffset).Limit(pageSize)
 	}
 
 	if err = query.Find(&tasks).Error; err != nil {
@@ -117,23 +110,19 @@ func (t *Task) ActiveList(pageOffset, pageSize int) ([]*Task, error) {
 }
 
 func (t *Task) Enable() error {
-	values := CommonMap{
-		"status": TaskStatusEnable,
-	}
-	_, err := t.Update(values)
-	if err != nil {
-		return err
-	}
-	return nil
+	t.Status = TaskStatusEnable
+	return global.DBEngine.Save(t).Error
 }
 
 func (t *Task) Disable() error {
-	values := CommonMap{
-		"status": TaskStatusDisable,
-	}
-	_, err := t.Update(values)
-	if err != nil {
-		return err
-	}
-	return nil
+	t.Status = TaskStatusDisable
+	return global.DBEngine.Save(t).Error
+}
+
+func (t *Task) IsEnable() bool {
+	return t.Status == TaskStatusEnable
+}
+
+func (t *Task) IsDisable() bool {
+	return t.Status == TaskStatusDisable
 }

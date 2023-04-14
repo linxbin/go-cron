@@ -69,15 +69,25 @@ func Update(request *UpdateTaskRequest) error {
 		global.Logger.Errorf("svc.UpdateTask err: %v", err)
 		return err
 	}
-
+	task.Name = request.Name
+	task.Command = request.Command
+	task.Status = request.Status
+	task.RetryTimes = request.RetryTimes
+	task.RetryInterval = request.RetryInterval
+	task.Timeout = request.Timeout
 	tx := global.DBEngine.Begin()
-	task, err = t.Update(request)
-	if err != nil {
+	if err = global.DBEngine.Save(&task).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
+
 	cron := cron2.NewCron()
-	err = cron.RemoveAndAddTask(task)
+	if task.IsEnable() {
+		err = cron.RemoveAndAddTask(task)
+	} else {
+		cron.RemoveTask(int(task.ID))
+	}
+
 	if err != nil {
 		tx.Rollback()
 		return err
