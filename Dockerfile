@@ -14,7 +14,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o server ./cmd/
+RUN go build -o server ./
 
 FROM debian:stretch-slim
 COPY ./wait-for-it.sh /
@@ -33,8 +33,4 @@ RUN set -eux; \
         --no-install-recommends  \
         dos2unix; \
     dos2unix wait-for-it.sh; \
-    chmod 755 wait-for-it.sh
-
-
-# 需要运行的命令
-#ENTRYPOINT ["/server"]
+        chmod 755 wait-for-it.sh \
